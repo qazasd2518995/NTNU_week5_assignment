@@ -564,6 +564,98 @@
         }
 
         /* ═══════════════════════════════════════
+           Deadline Bar
+           ═══════════════════════════════════════ */
+        .deadline-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 14px 0;
+            opacity: 0;
+            animation: fadeUp 0.8s var(--ease-out-expo) 0.35s forwards;
+        }
+
+        .deadline-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-wash);
+        }
+
+        .deadline-time {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.02em;
+        }
+
+        .deadline-countdown {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent-vermillion);
+            margin-left: auto;
+            letter-spacing: 0.02em;
+        }
+
+        .deadline-bar.urgent .deadline-countdown {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .deadline-bar.expired .deadline-time {
+            text-decoration: line-through;
+            color: var(--ink-wash);
+        }
+
+        .deadline-bar.expired .deadline-countdown {
+            color: var(--error-red);
+        }
+
+        /* ═══════════════════════════════════════
+           Expired Overlay
+           ═══════════════════════════════════════ */
+        .expired-overlay {
+            display: none;
+            text-align: center;
+            padding: 64px 24px;
+        }
+
+        .expired-overlay.visible {
+            display: block;
+            opacity: 0;
+            animation: fadeUp 0.8s var(--ease-out-expo) 0.2s forwards;
+        }
+
+        .expired-icon {
+            color: var(--ink-ghost);
+            margin-bottom: 20px;
+        }
+
+        .expired-title {
+            font-family: var(--font-western);
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--ink-medium);
+            margin-bottom: 8px;
+            letter-spacing: 0.03em;
+        }
+
+        .expired-text {
+            font-family: var(--font-western);
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--ink-wash);
+            font-style: italic;
+        }
+
+        /* ═══════════════════════════════════════
            Footer
            ═══════════════════════════════════════ */
         .footer {
@@ -659,6 +751,13 @@
             <p class="header-subtitle">Assignment Submission</p>
         </header>
 
+        <!-- Deadline banner -->
+        <div class="deadline-bar" id="deadlineBar">
+            <span class="deadline-label">Deadline</span>
+            <span class="deadline-time">Apr 2, 2026 — 11:59 PM (UTC+8)</span>
+            <span class="deadline-countdown" id="countdown"></span>
+        </div>
+
         <div class="divider"></div>
 
         <!-- Form -->
@@ -717,6 +816,18 @@
             <div class="status-message" id="statusMessage"></div>
         </form>
 
+        <!-- Expired overlay -->
+        <div class="expired-overlay" id="expiredOverlay">
+            <div class="expired-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+            <p class="expired-title">Submission Closed</p>
+            <p class="expired-text">The deadline has passed. Uploads are no longer accepted.</p>
+        </div>
+
         <!-- Footer -->
         <div class="footer">
             <p class="footer-text">NTNU — 2026 SPRING</p>
@@ -734,8 +845,14 @@
 
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ─── Deadline: Apr 2, 2026 23:59:59 UTC+8 ───
+        const DEADLINE = new Date('2026-04-02T23:59:59+08:00');
+
         // ─── DOM Elements ───
         const form = document.getElementById('submission-form');
+        const deadlineBar = document.getElementById('deadlineBar');
+        const countdownEl = document.getElementById('countdown');
+        const expiredOverlay = document.getElementById('expiredOverlay');
         const studentIdInput = document.getElementById('studentId');
         const studentNameInput = document.getElementById('studentName');
         const fileInput = document.getElementById('fileInput');
@@ -933,6 +1050,43 @@
                 submitBtn.disabled = false;
             }
         });
+
+        // ─── Deadline Countdown ───
+        function checkDeadline() {
+            const now = new Date();
+            const diff = DEADLINE - now;
+
+            if (diff <= 0) {
+                // Expired
+                countdownEl.textContent = 'Expired';
+                deadlineBar.classList.add('expired');
+                form.style.display = 'none';
+                expiredOverlay.classList.add('visible');
+                return false;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            if (days > 0) {
+                countdownEl.textContent = `${days}d ${hours}h ${minutes}m remaining`;
+            } else if (hours > 0) {
+                countdownEl.textContent = `${hours}h ${minutes}m ${seconds}s remaining`;
+                deadlineBar.classList.add('urgent');
+            } else {
+                countdownEl.textContent = `${minutes}m ${seconds}s remaining`;
+                deadlineBar.classList.add('urgent');
+            }
+
+            return true;
+        }
+
+        // Run immediately and update every second
+        if (checkDeadline()) {
+            setInterval(checkDeadline, 1000);
+        }
     </script>
 </body>
 </html>
