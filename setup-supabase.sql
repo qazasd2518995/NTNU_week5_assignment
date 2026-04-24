@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════
--- Supabase Setup: Week 5 Assignment Submission
+-- Supabase Setup: Assignment Submission
 -- Run this in Supabase SQL Editor (Dashboard > SQL)
 -- ═══════════════════════════════════════════════════
 
@@ -12,9 +12,14 @@ CREATE TABLE IF NOT EXISTS submissions (
     file_path TEXT NOT NULL,
     file_url TEXT,
     file_size BIGINT,
-    week INTEGER NOT NULL DEFAULT 5,
+    week INTEGER,
+    assignment_type TEXT,
     submitted_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 1a. If the table already exists from a previous run, add the new column
+ALTER TABLE submissions ADD COLUMN IF NOT EXISTS assignment_type TEXT;
+ALTER TABLE submissions ALTER COLUMN week DROP NOT NULL;
 
 -- 2. Enable Row Level Security
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;

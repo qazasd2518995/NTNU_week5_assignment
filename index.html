@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 5 — Assignment Submission</title>
+    <title>Assignment Submission</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
@@ -656,6 +656,161 @@
         }
 
         /* ═══════════════════════════════════════
+           Assignment List
+           ═══════════════════════════════════════ */
+        .assignment-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            opacity: 0;
+            animation: fadeUp 0.8s var(--ease-out-expo) 0.4s forwards;
+        }
+
+        .assignment-card {
+            position: relative;
+            display: block;
+            padding: 24px 28px;
+            background: transparent;
+            border: 1.5px solid var(--ink-ghost);
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s var(--ease-out-expo);
+            overflow: hidden;
+        }
+
+        .assignment-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent-vermillion-soft);
+            opacity: 0;
+            transition: opacity 0.4s var(--ease-out-expo);
+        }
+
+        .assignment-card:hover {
+            border-color: var(--ink-medium);
+            transform: translateX(3px);
+        }
+
+        .assignment-card:hover::before {
+            opacity: 0.5;
+        }
+
+        .assignment-card.expired {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .assignment-card.expired:hover {
+            transform: none;
+            border-color: var(--ink-ghost);
+        }
+
+        .assignment-card.expired:hover::before {
+            opacity: 0;
+        }
+
+        .card-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-meta {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-vermillion);
+            margin-bottom: 6px;
+        }
+
+        .card-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--ink-deep);
+        }
+
+        .card-arrow {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            color: var(--ink-wash);
+            transition: transform 0.3s var(--ease-out-expo), color 0.3s;
+        }
+
+        .assignment-card:hover .card-arrow {
+            color: var(--accent-vermillion);
+            transform: translateX(4px);
+        }
+
+        .card-deadline {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            margin-top: 10px;
+            letter-spacing: 0.02em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-status {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .card-status.open {
+            color: var(--success-green);
+        }
+
+        .card-status.closed {
+            color: var(--error-red);
+        }
+
+        /* ═══════════════════════════════════════
+           Back Button
+           ═══════════════════════════════════════ */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-bottom: 32px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            cursor: pointer;
+            transition: color 0.3s;
+            opacity: 0;
+            animation: fadeIn 0.6s var(--ease-out-expo) 0.1s forwards;
+        }
+
+        .back-btn:hover {
+            color: var(--accent-vermillion);
+        }
+
+        .back-arrow {
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+
+        .back-btn:hover .back-arrow {
+            transform: translateX(-3px);
+        }
+
+        /* ═══════════════════════════════════════
            Footer
            ═══════════════════════════════════════ */
         .footer {
@@ -737,31 +892,54 @@
 
     <div class="container">
         <!-- Seal stamp -->
-        <div class="seal">
-            <span class="seal-text">W5</span>
+        <div class="seal" id="seal">
+            <span class="seal-text" id="sealText">NTNU</span>
         </div>
 
-        <!-- Header -->
-        <header class="header">
-            <div class="week-badge">
-                <span class="week-number">Week 5</span>
-                <span class="week-line"></span>
+        <!-- ═══ List View ═══ -->
+        <section id="listView">
+            <header class="header">
+                <div class="week-badge">
+                    <span class="week-number">NTNU · 2026 Spring</span>
+                    <span class="week-line"></span>
+                </div>
+                <h1>Assignment Submission</h1>
+                <p class="header-subtitle">Select an assignment to submit</p>
+            </header>
+
+            <div class="divider"></div>
+
+            <ul class="assignment-list" id="assignmentList"></ul>
+        </section>
+
+        <!-- ═══ Detail View ═══ -->
+        <section id="detailView" style="display:none;">
+            <button type="button" class="back-btn" id="backBtn">
+                <span class="back-arrow">←</span>
+                <span>All assignments</span>
+            </button>
+
+            <!-- Header -->
+            <header class="header">
+                <div class="week-badge">
+                    <span class="week-number" id="detailBadge"></span>
+                    <span class="week-line"></span>
+                </div>
+                <h1 id="detailTitle"></h1>
+                <p class="header-subtitle" id="detailSubtitle"></p>
+            </header>
+
+            <!-- Deadline banner -->
+            <div class="deadline-bar" id="deadlineBar">
+                <span class="deadline-label">Deadline</span>
+                <span class="deadline-time" id="deadlineTime"></span>
+                <span class="deadline-countdown" id="countdown"></span>
             </div>
-            <h1>Assignment Submission</h1>
-            <p class="header-subtitle">Assignment Submission</p>
-        </header>
 
-        <!-- Deadline banner -->
-        <div class="deadline-bar" id="deadlineBar">
-            <span class="deadline-label">Deadline</span>
-            <span class="deadline-time">Apr 6, 2026 — 11:59 PM (UTC+8)</span>
-            <span class="deadline-countdown" id="countdown"></span>
-        </div>
+            <div class="divider"></div>
 
-        <div class="divider"></div>
-
-        <!-- Form -->
-        <form id="submission-form" class="form-section" novalidate>
+            <!-- Form -->
+            <form id="submission-form" class="form-section" novalidate>
             <!-- Student Info -->
             <div class="field-row">
                 <div class="field-group" id="studentIdGroup">
@@ -816,17 +994,18 @@
             <div class="status-message" id="statusMessage"></div>
         </form>
 
-        <!-- Expired overlay -->
-        <div class="expired-overlay" id="expiredOverlay">
-            <div class="expired-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                </svg>
+            <!-- Expired overlay -->
+            <div class="expired-overlay" id="expiredOverlay">
+                <div class="expired-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <p class="expired-title">Submission Closed</p>
+                <p class="expired-text">The deadline has passed. Uploads are no longer accepted.</p>
             </div>
-            <p class="expired-title">Submission Closed</p>
-            <p class="expired-text">The deadline has passed. Uploads are no longer accepted.</p>
-        </div>
+        </section>
 
         <!-- Footer -->
         <div class="footer">
@@ -845,10 +1024,45 @@
 
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ─── Deadline: Apr 6, 2026 23:59:59 UTC+8 ───
-        const DEADLINE = new Date('2026-04-06T23:59:59+08:00');
+        // ─── Assignments registry ───
+        const ASSIGNMENTS = [
+            {
+                id: 'form_a',
+                badge: 'Form A',
+                seal: 'FA',
+                title: 'April 24 · Form A Submission',
+                subtitle: 'Form A Submission',
+                deadline: new Date('2026-04-24T23:59:59+08:00'),
+                deadlineLabel: 'Apr 24, 2026 — 11:59 PM (UTC+8)',
+                storagePrefix: 'form_a',
+                payload: { assignment_type: 'form_a' }
+            },
+            {
+                id: 'week5',
+                badge: 'Week 5',
+                seal: 'W5',
+                title: 'Assignment Submission',
+                subtitle: 'Week 5 Assignment',
+                deadline: new Date('2026-04-06T23:59:59+08:00'),
+                deadlineLabel: 'Apr 6, 2026 — 11:59 PM (UTC+8)',
+                storagePrefix: 'week5',
+                payload: { week: 5 }
+            }
+        ];
+
+        let currentAssignment = null;
+        let countdownTimer = null;
 
         // ─── DOM Elements ───
+        const listView = document.getElementById('listView');
+        const detailView = document.getElementById('detailView');
+        const assignmentList = document.getElementById('assignmentList');
+        const backBtn = document.getElementById('backBtn');
+        const sealText = document.getElementById('sealText');
+        const detailBadge = document.getElementById('detailBadge');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailSubtitle = document.getElementById('detailSubtitle');
+        const deadlineTimeEl = document.getElementById('deadlineTime');
         const form = document.getElementById('submission-form');
         const deadlineBar = document.getElementById('deadlineBar');
         const countdownEl = document.getElementById('countdown');
@@ -998,11 +1212,13 @@
             submitBtn.disabled = true;
 
             try {
+                if (!currentAssignment) throw new Error('No assignment selected');
+
                 // Generate unique file path
                 const timestamp = Date.now();
                 const ext = selectedFile.name.split('.').pop().toLowerCase();
                 const sanitizedId = studentId.replace(/[^a-zA-Z0-9]/g, '_');
-                const filePath = `week5/${sanitizedId}_${timestamp}.${ext}`;
+                const filePath = `${currentAssignment.storagePrefix}/${sanitizedId}_${timestamp}.${ext}`;
 
                 // Upload file to Supabase Storage
                 const { data: uploadData, error: uploadError } = await sb.storage
@@ -1029,7 +1245,7 @@
                         file_path: filePath,
                         file_url: publicUrl,
                         file_size: selectedFile.size,
-                        week: 5
+                        ...currentAssignment.payload
                     });
 
                 if (dbError) throw dbError;
@@ -1053,11 +1269,11 @@
 
         // ─── Deadline Countdown ───
         function checkDeadline() {
+            if (!currentAssignment) return false;
             const now = new Date();
-            const diff = DEADLINE - now;
+            const diff = currentAssignment.deadline - now;
 
             if (diff <= 0) {
-                // Expired
                 countdownEl.textContent = 'Expired';
                 deadlineBar.classList.add('expired');
                 form.style.display = 'none';
@@ -1070,6 +1286,7 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
+            deadlineBar.classList.remove('urgent');
             if (days > 0) {
                 countdownEl.textContent = `${days}d ${hours}h ${minutes}m remaining`;
             } else if (hours > 0) {
@@ -1083,10 +1300,87 @@
             return true;
         }
 
-        // Run immediately and update every second
-        if (checkDeadline()) {
-            setInterval(checkDeadline, 1000);
+        // ─── View Routing ───
+        function renderList() {
+            assignmentList.innerHTML = '';
+            const now = new Date();
+            ASSIGNMENTS.forEach((a) => {
+                const expired = a.deadline - now <= 0;
+                const li = document.createElement('li');
+                const card = document.createElement(expired ? 'div' : 'button');
+                card.className = 'assignment-card' + (expired ? ' expired' : '');
+                if (!expired) {
+                    card.type = 'button';
+                    card.addEventListener('click', () => showDetail(a.id));
+                }
+                card.innerHTML = `
+                    <div class="card-row">
+                        <div>
+                            <div class="card-meta">${a.badge}</div>
+                            <div class="card-title">${a.title}</div>
+                        </div>
+                        <span class="card-arrow">→</span>
+                    </div>
+                    <div class="card-deadline">
+                        <span class="card-status ${expired ? 'closed' : 'open'}">${expired ? 'Closed' : 'Open'}</span>
+                        &nbsp;·&nbsp; Due ${a.deadlineLabel}
+                    </div>
+                `;
+                li.appendChild(card);
+                assignmentList.appendChild(li);
+            });
         }
+
+        function showDetail(id) {
+            const a = ASSIGNMENTS.find((x) => x.id === id);
+            if (!a) return;
+            currentAssignment = a;
+
+            sealText.textContent = a.seal;
+            detailBadge.textContent = a.badge;
+            detailTitle.textContent = a.title;
+            detailSubtitle.textContent = a.subtitle;
+            deadlineTimeEl.textContent = a.deadlineLabel;
+
+            // Reset form state
+            form.style.display = '';
+            expiredOverlay.classList.remove('visible');
+            deadlineBar.classList.remove('expired', 'urgent');
+            hideStatus();
+            studentIdInput.value = '';
+            studentNameInput.value = '';
+            clearFile();
+            document.getElementById('studentIdGroup').classList.remove('error');
+            document.getElementById('studentNameGroup').classList.remove('error');
+            document.getElementById('fileGroup').classList.remove('error');
+
+            listView.style.display = 'none';
+            detailView.style.display = '';
+
+            if (countdownTimer) clearInterval(countdownTimer);
+            if (checkDeadline()) {
+                countdownTimer = setInterval(checkDeadline, 1000);
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showList() {
+            currentAssignment = null;
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            detailView.style.display = 'none';
+            listView.style.display = '';
+            sealText.textContent = 'NTNU';
+            renderList();
+        }
+
+        backBtn.addEventListener('click', showList);
+
+        // Init
+        renderList();
     </script>
 </body>
 </html>
