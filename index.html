@@ -1027,6 +1027,18 @@
         // ─── Assignments registry ───
         const ASSIGNMENTS = [
             {
+                id: 'midterm',
+                badge: 'Midterm Exam',
+                seal: 'MID',
+                title: 'Midterm Exam Submission',
+                subtitle: 'Midterm Exam Submission',
+                availableFrom: new Date('2026-05-08T14:00:00+08:00'),
+                deadline: new Date('2026-05-08T17:00:00+08:00'),
+                deadlineLabel: 'May 8, 2026 — 2:00 PM to 5:00 PM (UTC+8)',
+                storagePrefix: 'midterm',
+                payload: { assignment_type: 'midterm' }
+            },
+            {
                 id: 'form_a',
                 badge: 'Form A',
                 seal: 'FA',
@@ -1317,13 +1329,17 @@
             const now = new Date();
             ASSIGNMENTS.forEach((a) => {
                 const expired = a.deadline - now <= 0;
+                const notYetOpen = a.availableFrom && a.availableFrom - now > 0;
+                const inactive = expired || notYetOpen;
                 const li = document.createElement('li');
-                const card = document.createElement(expired ? 'div' : 'button');
-                card.className = 'assignment-card' + (expired ? ' expired' : '');
-                if (!expired) {
+                const card = document.createElement(inactive ? 'div' : 'button');
+                card.className = 'assignment-card' + (inactive ? ' expired' : '');
+                if (!inactive) {
                     card.type = 'button';
                     card.addEventListener('click', () => showDetail(a.id));
                 }
+                const statusLabel = expired ? 'Closed' : (notYetOpen ? 'Not yet open' : 'Open');
+                const statusClass = expired ? 'closed' : (notYetOpen ? 'closed' : 'open');
                 card.innerHTML = `
                     <div class="card-row">
                         <div>
@@ -1333,8 +1349,8 @@
                         <span class="card-arrow">→</span>
                     </div>
                     <div class="card-deadline">
-                        <span class="card-status ${expired ? 'closed' : 'open'}">${expired ? 'Closed' : 'Open'}</span>
-                        &nbsp;·&nbsp; Due ${a.deadlineLabel}
+                        <span class="card-status ${statusClass}">${statusLabel}</span>
+                        &nbsp;·&nbsp; ${a.availableFrom ? '' : 'Due '}${a.deadlineLabel}
                     </div>
                 `;
                 li.appendChild(card);
